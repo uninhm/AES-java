@@ -1,25 +1,30 @@
 import java.util.Arrays;
 
 public class AES {
-    public static int BLOCK_SIZE = 128;
+    private static int BLOCK_SIZE = 128;
 
     /// Represente l'etat actuel. C'est sur ce tableau qu'on effectue les operations.
     private byte[] state = new byte[BLOCK_SIZE];
 
     private int keySize;
-    private byte[] baseKey, currentKey;
-
     private int numberOfIterations;
 
-    public AES(int keySize) {
+    /// Corresponds to the index of RC that will be used when generating keys starting with 0;
+    /// i.e. RC[0] = 0x01
+    private int keyCount = 0;
+    private byte[] baseKey, currentKey;
+
+    public AES(int keySize, byte[] key) {
         this.keySize = keySize;
+        this.baseKey = key.clone();
 
         this.setNumberOfIterations();
     }
 
-    public byte[] encrypt(char[] message, byte[] key) {
-        this.baseKey = key;
-        this.currentKey = key.clone();
+    public byte[] encrypt(char[] message) {
+        this.currentKey = this.baseKey.clone();
+
+        return new byte[0];
     }
 
     private void setNumberOfIterations() {
@@ -38,15 +43,5 @@ public class AES {
         }
     }
 
-    private void nextKey() {
-        byte[] newKey = new byte[keySize];
 
-        // This is the last word of the current key, meaning the last 4 bytes
-        // It will be updated when new words are generated during the execution of this method.
-        byte[] lastWord = Arrays.copyOfRange(currentKey, currentKey.length - 4, currentKey.length);
-
-        for (int i = 0; 32*i < keySize; ++i) {
-            continue; // TODO: Implement
-        }
-    }
 }
