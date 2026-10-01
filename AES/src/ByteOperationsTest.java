@@ -47,4 +47,22 @@ class ByteOperationsTest {
 
         assertArrayEquals(new byte[] {0x00, (byte) 0xF0, 0x0F, 0x00}, a);
     }
+
+    @Test
+    void matrixMult() {
+        int[][] M = {
+                {2, 3, 1, 1},
+                {1, 2, 3, 1},
+                {1, 1, 2, 3},
+                {3, 1, 1, 2}
+        };
+
+        assertArrayEquals(
+                new byte[] { 0x08, 0x5b, 0x6d, 0x16 },
+                ByteOperations.matrixMult(
+                        M,
+                        new byte[] { 0x52, 0x6b, 0x67, 0x76 }
+                )
+        );
+    }
 }
