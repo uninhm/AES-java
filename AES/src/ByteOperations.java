@@ -1,6 +1,6 @@
 public class ByteOperations {
-    public static int WORD_SIZE = 4;
-    public static byte MOD = (byte) 0x1B;
+    public static final int WORD_SIZE = 4;
+    public static final byte MOD = (byte) 0x1B;
 
     private static final int[] S_BOX =
             {

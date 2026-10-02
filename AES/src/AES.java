@@ -1,42 +1,35 @@
-import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HexFormat;
 
 public class AES {
-    public static int BLOCK_SIZE = 16;
+    public static final int BLOCK_SIZE = 16;
 
     /// Number of rows of the matrix where we arrange (theoretically) the bytes
     /// of the state.
-    private static int ROWS = 4;
+    private static final int ROWS = 4;
 
     /// Number of columns of the matrix where we arrange (theoretically) the bytes
     /// of the state.
-    private static int COLUMNS = 4;
+    private static final int COLUMNS = 4;
 
     /// This array contains the block to be encrypted or decrypted
     /// It will be modified inplace by each operation
-    private byte[] state = new byte[BLOCK_SIZE];
+    private final byte[] state = new byte[BLOCK_SIZE];
 
     /// Base key size in bits
-    private int keySize;
+    private final int keySize;
 
     /// Number of the current round
     private int round;
 
-    /// The base key chosen on construction of the object
-    private byte[] baseKey;
-
-    private KeyGenerator keyGenerator;
+    private final KeyGenerator keyGenerator;
 
     /// Construct an AES object with the corresponding key.
     /// The array must be of length 16, 24 or 32 for AES 128, 192 and 256 respectively.
     /// @param key an array containing the bytes of the key
     public AES(byte[] key) {
         this.keySize = key.length * 8;
-        this.baseKey = key.clone();
-
-        this.keyGenerator = new KeyGenerator(this.baseKey);
+        this.keyGenerator = new KeyGenerator(key);
     }
 
     /// Construct an AES object with the corresponding key.
@@ -144,16 +137,12 @@ public class AES {
     /// Returns the number of iterations according to the key size.
     /// If the key size is different of 128, 192 and 256 it throws an exception.
     private int getNumberOfIterations() {
-        switch (this.keySize) {
-            case 128:
-                return 10;
-            case 192:
-                return 12;
-            case 256:
-                return 14;
-            default:
-                throw new InvalidKeySizeException(this.keySize);
-        }
+        return switch (this.keySize) {
+            case 128 -> 10;
+            case 192 -> 12;
+            case 256 -> 14;
+            default -> throw new InvalidKeySizeException(this.keySize);
+        };
     }
 
     /// AddRoundKey inplace operation

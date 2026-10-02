@@ -5,7 +5,7 @@ public class KeyGenerator {
     /// The length of each round key in bytes
     public static final int ROUND_KEY_LENGTH = 16;
 
-    public static int[] RC =
+    public static final int[] RC =
             { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36 };
 
     /// This is the maximum when generating 15 round keys on AES-256.

@@ -1,6 +1,4 @@
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestTemplate;
 
 import java.util.HexFormat;
 import java.util.Random;
@@ -8,7 +6,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AESTest {
-    Random rnd = new Random();
+    final Random rnd = new Random();
 
     @Test
     void encrypt128() {
