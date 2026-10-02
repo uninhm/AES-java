@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.HexFormat;
 
 public class AES {
-    private static int BLOCK_SIZE = 16;
+    public static int BLOCK_SIZE = 16;
 
     /// Represente l'etat actuel. C'est sur ce tableau qu'on effectue les operations.
     private byte[] state = new byte[BLOCK_SIZE];
@@ -53,6 +53,30 @@ public class AES {
         return state.clone();
     }
 
+    public byte[] decrypt(byte[] cypher) {
+        Arrays.fill(this.state, (byte) 0);
+        System.arraycopy(cypher, 0, state, 0, Math.min(state.length, cypher.length));
+
+        round = this.getNumberOfIterations();
+
+        this.addRoundKey();
+        this.shiftRowsInv();
+        this.subBytesInv();
+
+        round--;
+
+        for (; round > 0; --round) {
+            this.addRoundKey();
+            this.mixColumnsInv();
+            this.shiftRowsInv();
+            this.subBytesInv();
+        }
+
+        this.addRoundKey();
+
+        return this.state.clone();
+    }
+
     private int getNumberOfIterations() {
         switch (this.keySize) {
             case 128:
@@ -74,14 +98,24 @@ public class AES {
         ByteOperations.subBytes(this.state);
     }
 
+    private void subBytesInv() {
+        ByteOperations.subBytesInv(this.state);
+    }
+
     private void shiftRows() {
         for (int j = 1; j < ROWS; ++j) {
             ByteOperations.rotBytes(this.state, j, 4, j, 4);
         }
     }
 
+    private void shiftRowsInv() {
+        for (int j = 1; j < ROWS; ++j) {
+            ByteOperations.rotBytes(this.state, j, 4, 4-j, 4);
+        }
+    }
+
     private void mixColumns() {
-        int[][] M = {
+        final int[][] M = {
                 {2, 3, 1, 1},
                 {1, 2, 3, 1},
                 {1, 1, 2, 3},
@@ -91,15 +125,34 @@ public class AES {
         for (int i = 0; i < COLUMNS; ++i) {
             // Copy the column to a vector called col
             byte[] col = new byte[ROWS];
-            for (int j = 0; j < ROWS; ++j)
-                col[j] = state[i*ROWS + j];
+            System.arraycopy(state, i*ROWS, col, 0, ROWS);
 
             // Calculate the matrix-vector product
             byte[] res = ByteOperations.matrixMult(M, col);
 
             // Copy the result back to the column
-            for (int j = 0; j < ROWS; ++j)
-                state[i*ROWS + j] = res[j];
+            System.arraycopy(res, 0, state, i*ROWS, ROWS);
+        }
+    }
+
+    private void mixColumnsInv() {
+        final int[][] M_INV = {
+                { 14, 11, 13, 9 },
+                { 9, 14, 11, 13 },
+                { 13, 9, 14, 11 },
+                { 11, 13, 9, 14 }
+        };
+
+        for (int i = 0; i < COLUMNS; ++i) {
+            // Copy the column to a vector called col
+            byte[] col = new byte[ROWS];
+            System.arraycopy(state, i*ROWS, col, 0, ROWS);
+
+            // Calculate the matrix-vector product
+            byte[] res = ByteOperations.matrixMult(M_INV, col);
+
+            // Copy the result back to the column
+            System.arraycopy(res, 0, state, i*ROWS, ROWS);
         }
     }
 }

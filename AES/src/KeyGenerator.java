@@ -84,7 +84,7 @@ public class KeyGenerator {
         int ROUND_KEY_LENGTH = 16;
 
         // If we haven't generated that part already
-        if (wordsLength < ROUND_KEY_LENGTH*(i+1))
+        while (wordsLength < ROUND_KEY_LENGTH*(i+1))
             nextKey();
 
         return Arrays.copyOfRange(this.words, ROUND_KEY_LENGTH*i, ROUND_KEY_LENGTH*(i+1));

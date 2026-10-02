@@ -59,7 +59,7 @@ public class ByteOperations {
     /// @param offset the offset
     /// @param step the space between two elements belonging to the subsequence
     public static void rotBytes(byte[] bytes, int start, int length, int offset, int step) {
-        byte temp[] = bytes.clone();
+        byte[] temp = bytes.clone();
         for (int i = 0; i < length; ++i)
             bytes[start + i*step] = temp[start + ((i+offset)%length)*step];
     }
@@ -70,6 +70,15 @@ public class ByteOperations {
     public static void subBytes(byte[] byteArray) {
         for (int i = 0; i < byteArray.length; ++i) {
             byteArray[i] = (byte) S_BOX[byteArray[i] & 0xFF];
+        }
+    }
+
+    /// Apply the inverse of the SubBytes operation to 'byteArray' inplace.
+    /// Note that SubWord is the same operation with a 4-byte array.
+    /// @param byteArray the byte array to be modified
+    public static void subBytesInv(byte[] byteArray) {
+        for (int i = 0; i < byteArray.length; ++i) {
+            byteArray[i] = (byte) S_BOX_INV[byteArray[i] & 0xFF];
         }
     }
 
