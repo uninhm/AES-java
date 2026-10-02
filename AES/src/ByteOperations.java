@@ -112,6 +112,7 @@ public class ByteOperations {
         }
     }
 
+    /// Multiply a byte by an integer 'n' in O(log n) time.
     public static byte mult(byte a, int n) {
         if (n == 0)
             return 0;
@@ -124,14 +125,20 @@ public class ByteOperations {
         }
     }
 
+    /// Multiply a matrix of integers by a vector of bytes
+    /// @param M the matrix
+    /// @param a the vector
     public static byte[] matrixMult(int[][] M, byte[] a) {
         byte[] res = new byte[M.length];
 
+        // For each row of the matrix
         for (int i = 0; i < res.length; ++i) {
-            byte temp = 0;
+            byte temp = 0; // Result of the linear combination
+
             for (int j = 0; j < a.length; ++j) {
                 temp ^= mult(a[j], M[i][j]);
             }
+
             res[i] = temp;
         }
 

@@ -2,15 +2,25 @@ import java.util.Arrays;
 import java.util.HexFormat;
 
 public class KeyGenerator {
+    /// The length of each round key in bytes
+    public static final int ROUND_KEY_LENGTH = 16;
+
     public static int[] RC =
             { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36 };
 
+    /// This is the maximum when generating 15 round keys on AES-256.
+    /// Because we generate 32 bytes each time (one key length) it gets rounded to 256.
+    private final static int MAX_GENERATED_BYTES = 256;
 
-    // This is the maximum when generating 15 round keys on AES-256
-    // Because we generate 32 bytes each time (one key length) it gets rounded to 256.
-    private static int MAX_GENERATED_BYTES = 256;
+    /// The array containing all the generated words, including the base key.
     private final byte[] words = new byte[MAX_GENERATED_BYTES];
+
+    /// The number of bytes currently used in the 'words' array.
+    /// Increments with each word generated.
     private int wordsLength;
+
+    /// The number of whole keys generated. e.g. for a 256-bit key this variable
+    /// increments of 1 every 8 words (32 bytes).
     private int keyCount = 0;
 
     /// Key length in bytes
@@ -80,13 +90,11 @@ public class KeyGenerator {
     }
 
     public byte[] getRoundKey(int i) {
-        // Each round key corresponds to 16 bytes or equivalently 4 words.
-        int ROUND_KEY_LENGTH = 16;
-
         // If we haven't generated that part already
         while (wordsLength < ROUND_KEY_LENGTH*(i+1))
-            nextKey();
+            this.nextKey();
 
+        // Return a copy of the part of the array corresponding to the ith round key
         return Arrays.copyOfRange(this.words, ROUND_KEY_LENGTH*i, ROUND_KEY_LENGTH*(i+1));
     }
 }

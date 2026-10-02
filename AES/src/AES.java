@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HexFormat;
@@ -5,17 +6,32 @@ import java.util.HexFormat;
 public class AES {
     public static int BLOCK_SIZE = 16;
 
-    /// Represente l'etat actuel. C'est sur ce tableau qu'on effectue les operations.
-    private byte[] state = new byte[BLOCK_SIZE];
+    /// Number of rows of the matrix where we arrange (theoretically) the bytes
+    /// of the state.
     private static int ROWS = 4;
+
+    /// Number of columns of the matrix where we arrange (theoretically) the bytes
+    /// of the state.
     private static int COLUMNS = 4;
 
+    /// This array contains the block to be encrypted or decrypted
+    /// It will be modified inplace by each operation
+    private byte[] state = new byte[BLOCK_SIZE];
+
+    /// Base key size in bits
     private int keySize;
 
+    /// Number of the current round
     private int round;
+
+    /// The base key chosen on construction of the object
     private byte[] baseKey;
+
     private KeyGenerator keyGenerator;
 
+    /// Construct an AES object with the corresponding key.
+    /// The array must be of length 16, 24 or 32 for AES 128, 192 and 256 respectively.
+    /// @param key an array containing the bytes of the key
     public AES(byte[] key) {
         this.keySize = key.length * 8;
         this.baseKey = key.clone();
@@ -23,17 +39,62 @@ public class AES {
         this.keyGenerator = new KeyGenerator(this.baseKey);
     }
 
+    /// Construct an AES object with the corresponding key.
+    /// The number of bytes in the string must be 16, 24 or 32 for AES 128, 192 and 256 respectively.
+    /// @param key the hexadecimal representation of the key
     public AES(String key) {
         this(HexFormat.of().parseHex(key));
     }
 
+    /// Encrypt a message encoded with UTF_8.
+    /// @param message the message string
     public byte[] encrypt(String message) {
         return encrypt(message.getBytes(StandardCharsets.UTF_8));
     }
 
+    /// Encrypt an array of bytes.
+    /// If the length isn't a multiple of 16, 0s will be added as padding at the end.
+    /// @param message the message as an array of bytes
     public byte[] encrypt(byte[] message) {
-        Arrays.fill(this.state, (byte) 0);
-        System.arraycopy(message, 0, state, 0, Math.min(state.length, message.length));
+        // The resulting length is the next multiple of 16 after the message length
+        byte[] result = new byte[(message.length+15)/16*16];
+
+        for (int i = 0; i < message.length; i += BLOCK_SIZE) {
+            // Copy the resulting block to the result
+            System.arraycopy(this.encryptBlock(message, i), 0, result, i, BLOCK_SIZE);
+        }
+
+        return result;
+    }
+
+    /// Decrypt an array of bytes.
+    /// The length must be a multiple of 16.
+    /// @param cypher the cyphertext
+    public byte[] decrypt(byte[] cypher) {
+        byte[] result = new byte[cypher.length];
+
+        for (int i = 0; i < cypher.length; i += BLOCK_SIZE) {
+            // Copy the resulting block to the result
+            System.arraycopy(this.decryptBlock(cypher, i), 0, result, i, BLOCK_SIZE);
+        }
+
+        return result;
+    }
+
+    /// Encrypt a block given as an array of bytes. If there aren't
+    /// enough bytes to make a block of 16, 0s will be added to the right.
+    /// @param bytes the message byte array
+    /// @param start the index where the block starts
+    private byte[] encryptBlock(byte[] bytes, int start) {
+        // If there isn't enough bytes use as much as available
+        int actualLength = Math.min(bytes.length - start, BLOCK_SIZE);
+
+        // Copy the block to the state
+        System.arraycopy(bytes, start, this.state, 0, actualLength);
+
+        // Add padding when needed
+        for (int i = actualLength; i < BLOCK_SIZE; ++i)
+            state[i] = 0;
 
         round = 0;
         this.addRoundKey();
@@ -53,9 +114,12 @@ public class AES {
         return state.clone();
     }
 
-    public byte[] decrypt(byte[] cypher) {
-        Arrays.fill(this.state, (byte) 0);
-        System.arraycopy(cypher, 0, state, 0, Math.min(state.length, cypher.length));
+    /// Decrypt the block starting at 'start' given an array of bytes.
+    /// The length of the block will be exactly 16 bytes.
+    /// @param bytes a byte array
+    /// @param start the index where the block starts
+    private byte[] decryptBlock(byte[] bytes, int start) {
+        System.arraycopy(bytes, start, state, 0, BLOCK_SIZE);
 
         round = this.getNumberOfIterations();
 
@@ -77,6 +141,8 @@ public class AES {
         return this.state.clone();
     }
 
+    /// Returns the number of iterations according to the key size.
+    /// If the key size is different of 128, 192 and 256 it throws an exception.
     private int getNumberOfIterations() {
         switch (this.keySize) {
             case 128:
@@ -90,30 +156,36 @@ public class AES {
         }
     }
 
+    /// AddRoundKey inplace operation
     private void addRoundKey() {
         ByteOperations.plus(this.state, this.keyGenerator.getRoundKey(round));
     }
 
+    /// SubBytes inplace operation
     private void subBytes() {
         ByteOperations.subBytes(this.state);
     }
 
+    /// SubBytes inverse inplace operation
     private void subBytesInv() {
         ByteOperations.subBytesInv(this.state);
     }
 
+    /// ShiftRows inplace operation
     private void shiftRows() {
         for (int j = 1; j < ROWS; ++j) {
             ByteOperations.rotBytes(this.state, j, 4, j, 4);
         }
     }
 
+    /// ShiftRows inverse inplace operation
     private void shiftRowsInv() {
         for (int j = 1; j < ROWS; ++j) {
             ByteOperations.rotBytes(this.state, j, 4, 4-j, 4);
         }
     }
 
+    /// MixColumns inplace operation
     private void mixColumns() {
         final int[][] M = {
                 {2, 3, 1, 1},
@@ -135,6 +207,7 @@ public class AES {
         }
     }
 
+    /// MixColumns inverse inplace operation
     private void mixColumnsInv() {
         final int[][] M_INV = {
                 { 14, 11, 13, 9 },

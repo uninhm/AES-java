@@ -81,7 +81,7 @@ class AESTest {
         byte[] key = new byte[keyLength];
         rnd.nextBytes(key);
 
-        byte[] text = new byte[AES.BLOCK_SIZE];
+        byte[] text = new byte[AES.BLOCK_SIZE * 10];
         rnd.nextBytes(key);
 
         AES aes = new AES(key);
