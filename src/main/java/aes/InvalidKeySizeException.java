@@ -1,3 +1,5 @@
+package aes;
+
 public class InvalidKeySizeException extends RuntimeException {
     /// Construct an exception with the message passed as a parameter.
     /// @param message the error message

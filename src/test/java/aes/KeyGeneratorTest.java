@@ -1,6 +1,8 @@
-import java.util.HexFormat;
+package aes;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+
+import java.util.HexFormat;
 
 class KeyGeneratorTest {
 
@@ -23,7 +25,7 @@ class KeyGeneratorTest {
         };
 
         for (int i = 0; i < keys.length; ++i) {
-            assertArrayEquals(
+            Assertions.assertArrayEquals(
                     HexFormat.of().parseHex(keys[i]),
                     keygen.getRoundKey(i)
             );
@@ -52,7 +54,7 @@ class KeyGeneratorTest {
         };
 
         for (int i = 0; i < keys.length; ++i) {
-            assertArrayEquals(
+            Assertions.assertArrayEquals(
                     HexFormat.of().parseHex(keys[i]),
                     keygen.getRoundKey(i)
             );
@@ -83,7 +85,7 @@ class KeyGeneratorTest {
         };
 
         for (int i = 0; i < keys.length; ++i) {
-            assertArrayEquals(
+            Assertions.assertArrayEquals(
                     HexFormat.of().parseHex(keys[i]),
                     keygen.getRoundKey(i)
             );

@@ -1,3 +1,6 @@
+package aes;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,8 +27,8 @@ class ByteOperationsTest {
 
     @Test
     void xtimes() {
-        assertEquals((byte) 0xAE, ByteOperations.xtimes((byte) 0x57));
-        assertEquals((byte) 0x1B, ByteOperations.xtimes((byte) 0x80));
+        Assertions.assertEquals((byte) 0xAE, ByteOperations.xtimes((byte) 0x57));
+        Assertions.assertEquals((byte) 0x1B, ByteOperations.xtimes((byte) 0x80));
     }
 
     @Test
@@ -57,7 +60,7 @@ class ByteOperationsTest {
                 {3, 1, 1, 2}
         };
 
-        assertArrayEquals(
+        Assertions.assertArrayEquals(
                 new byte[] { 0x08, 0x5b, 0x6d, 0x16 },
                 ByteOperations.matrixMult(
                         M,
