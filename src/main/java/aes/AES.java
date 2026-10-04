@@ -78,6 +78,9 @@ public class AES {
      * @return the decrypted message as an array of bytes
      */
     public byte[] decrypt(byte[] cypher) {
+        if (cypher.length % BLOCK_SIZE != 0)
+            throw new IllegalArgumentException("The length of the cypher text must be a multiple of 16");
+
         byte[] result = new byte[cypher.length];
 
         for (int i = 0; i < cypher.length; i += BLOCK_SIZE) {
@@ -93,7 +96,7 @@ public class AES {
     /// @param bytes the message byte array
     /// @param start the index where the block starts
     private byte[] encryptBlock(byte[] bytes, int start) {
-        // If there isn't enough bytes use as much as available
+        // If there aren't enough bytes use as much as available
         int actualLength = Math.min(bytes.length - start, BLOCK_SIZE);
 
         // Copy the block to the state
