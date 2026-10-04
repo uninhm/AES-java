@@ -3,11 +3,15 @@ package aes;
 import java.util.Arrays;
 import java.util.HexFormat;
 
+/**
+ * Key generator for AES.
+ * This class generates the round keys from the base key.
+ */
 public class KeyGenerator {
-    /// The length of each round key in bytes
+    /** The length of each round key in bytes */
     public static final int ROUND_KEY_LENGTH = 16;
 
-    public static final int[] RC =
+    private static final int[] RC =
             { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36 };
 
     /// This is the maximum when generating 15 round keys on AES-256.
@@ -28,8 +32,10 @@ public class KeyGenerator {
     /// Key length in bytes
     private final int keyLength;
 
-    /// Construct a key generator using 'key' as the base key.
-    /// @param key byte array representation of the key
+    /**
+     * Construct a key generator using 'key' as the base key.
+     * @param key byte array representation of the key
+     */
     public KeyGenerator(byte[] key) {
         switch (key.length) {
             case 16:
@@ -45,8 +51,10 @@ public class KeyGenerator {
         this.keyLength = key.length;
     }
 
-    /// Construct a key generator from a hexadecimal representation of the key.
-    /// @param key hexadecimal representation of the key
+    /**
+     * Construct a key generator from a hexadecimal representation of the key.
+     * @param key hexadecimal representation of the key
+     */
     public KeyGenerator(String key) {
         this(HexFormat.of().parseHex(key));
     }
@@ -91,6 +99,11 @@ public class KeyGenerator {
         keyCount++;
     }
 
+    /**
+     * Get the i-th round key.
+     * @param i the round number, starting from 0 for the original key
+     * @return the i-th round key as a byte array
+     */
     public byte[] getRoundKey(int i) {
         // If we haven't generated that part already
         while (wordsLength < ROUND_KEY_LENGTH*(i+1))

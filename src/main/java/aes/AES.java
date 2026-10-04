@@ -3,14 +3,18 @@ package aes;
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 
+/**
+ * AES implementation.
+ */
 public class AES {
+    /** The size of the block in bytes */
     public static final int BLOCK_SIZE = 16;
 
-    /// Number of rows of the matrix where we arrange (theoretically) the bytes
+    /// Number of rows of the matrix where we (theoretically) arrange the bytes
     /// of the state.
     private static final int ROWS = 4;
 
-    /// Number of columns of the matrix where we arrange (theoretically) the bytes
+    /// Number of columns of the matrix where we (theoretically) arrange the bytes
     /// of the state.
     private static final int COLUMNS = 4;
 
@@ -26,30 +30,36 @@ public class AES {
 
     private final KeyGenerator keyGenerator;
 
-    /// Construct an AES object with the corresponding key.
-    /// The array must be of length 16, 24 or 32 for AES 128, 192 and 256 respectively.
-    /// @param key an array containing the bytes of the key
+    /** Construct an AES object with the corresponding key.
+     * The array must be of length 16, 24 or 32 for AES 128, 192 and 256 respectively.
+     * @param key an array containing the bytes of the key
+     */
     public AES(byte[] key) {
         this.keySize = key.length * 8;
         this.keyGenerator = new KeyGenerator(key);
     }
 
-    /// Construct an AES object with the corresponding key.
-    /// The number of bytes in the string must be 16, 24 or 32 for AES 128, 192 and 256 respectively.
-    /// @param key the hexadecimal representation of the key
+    /** Construct an AES object with the corresponding key.
+     * The number of bytes in the string must be 16, 24 or 32 for AES 128, 192 and 256 respectively.
+     * @param key the hexadecimal representation of the key
+     */
     public AES(String key) {
         this(HexFormat.of().parseHex(key));
     }
 
-    /// Encrypt a message encoded with UTF_8.
-    /// @param message the message string
+    /** Encrypt a message encoded with UTF_8.
+     * @param message the message string
+     * @return the encrypted message as an array of bytes
+     */
     public byte[] encrypt(String message) {
         return encrypt(message.getBytes(StandardCharsets.UTF_8));
     }
 
-    /// Encrypt an array of bytes.
-    /// If the length isn't a multiple of 16, 0s will be added as padding at the end.
-    /// @param message the message as an array of bytes
+    /** Encrypt an array of bytes.
+     * If the length isn't a multiple of 16, 0s will be added as padding at the end.
+     * @param message the message as an array of bytes
+     * @return the encrypted message as an array of bytes
+     */
     public byte[] encrypt(byte[] message) {
         // The resulting length is the next multiple of 16 after the message length
         byte[] result = new byte[(message.length+15)/16*16];
@@ -62,9 +72,11 @@ public class AES {
         return result;
     }
 
-    /// Decrypt an array of bytes.
-    /// The length must be a multiple of 16.
-    /// @param cypher the cyphertext
+    /** Decrypt an array of bytes.
+     * The length must be a multiple of 16.
+     * @param cypher the cyphertext
+     * @return the decrypted message as an array of bytes
+     */
     public byte[] decrypt(byte[] cypher) {
         byte[] result = new byte[cypher.length];
 

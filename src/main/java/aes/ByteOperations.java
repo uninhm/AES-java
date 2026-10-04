@@ -1,8 +1,9 @@
 package aes;
 
-public class ByteOperations {
-    public static final int WORD_SIZE = 4;
-    public static final byte MOD = (byte) 0x1B;
+class ByteOperations {
+    static final int WORD_SIZE = 4;
+
+    private static final byte MOD = (byte) 0x1B;
 
     private static final int[] S_BOX =
             {
