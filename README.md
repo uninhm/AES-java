@@ -4,7 +4,7 @@ This project is an AES implementation in Java for a college assignment, don't us
 
 ## How to use
 
-Download the JAR from the [1.0.0 release](https://github.com/uninhm/AES-java/releases/tag/1.0.0).
+Download the JAR from the [1.0.1 release](https://github.com/uninhm/AES-java/releases/tag/1.0.1).
 
 Then add the JAR to your Java project's dependencies and import the `AES` class:
 
@@ -21,4 +21,4 @@ public class Main {
 }
 ```
 
-The AES variant (128, 192, 256) will be deduced from the key length.
+The AES variant (128, 192, 256) will be deduced from the key length. The package also exports the `KeyGenerator` class so that you can experiment with it or debug your own implementation. See [the docs](https://uninhm.github.io/AES-java/aes/KeyGenerator.html).
