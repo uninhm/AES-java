@@ -133,4 +133,48 @@ class AESTest {
         for (int i = 0; i < 4; ++i)
             randomEncryptDecrypt(32);
     }
+
+    @Test
+    void plaintextLengths() {
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f");
+
+        Assertions.assertEquals(0, aes.encrypt(new byte[0]).length);
+        Assertions.assertEquals(16, aes.encrypt(new byte[1]).length);
+        Assertions.assertEquals(16, aes.encrypt(new byte[15]).length);
+        Assertions.assertEquals(16, aes.encrypt(new byte[16]).length);
+        Assertions.assertEquals(32, aes.encrypt(new byte[17]).length);
+        Assertions.assertEquals(32, aes.encrypt(new byte[31]).length);
+        Assertions.assertEquals(32, aes.encrypt(new byte[32]).length);
+        Assertions.assertEquals(48, aes.encrypt(new byte[33]).length);
+    }
+
+    @Test
+    void decryptInvalidLength() {
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f");
+
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> aes.decrypt(new byte[15])
+        );
+
+        Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> aes.decrypt(new byte[17])
+        );
+    }
+    @Test
+    void repeatedUse() {
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f");
+
+        byte[] a = new byte[16];
+        rnd.nextBytes(a);
+        byte[] b = new byte[16];
+        rnd.nextBytes(b);
+
+        byte[] encryptedA = aes.encrypt(a);
+        byte[] encryptedB = aes.encrypt(b);
+
+        Assertions.assertArrayEquals(a, aes.decrypt(encryptedA));
+        Assertions.assertArrayEquals(b, aes.decrypt(encryptedB));
+    }
 }

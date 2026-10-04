@@ -1,12 +1,13 @@
 package aes;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HexFormat;
 
 class KeyGeneratorTest {
 
-    @org.junit.jupiter.api.Test
+    @Test
     void getRoundKey128() {
         KeyGenerator keygen = new KeyGenerator("000102030405060708090a0b0c0d0e0f");
 
@@ -33,7 +34,7 @@ class KeyGeneratorTest {
         }
     }
 
-    @org.junit.jupiter.api.Test
+    @Test
     void getRoundKey192() {
         KeyGenerator keygen = new KeyGenerator("000102030405060708090a0b0c0d0e0f1011121314151617");
 
@@ -91,5 +92,25 @@ class KeyGeneratorTest {
             );
             System.out.printf("Round key %d correct%n", i);
         }
+    }
+
+    @Test
+    void invalidKeySizes() {
+        int[] invalidSizes = {0, 1, 15, 17, 23, 25, 31, 33};
+
+        for (int size : invalidSizes) {
+            Assertions.assertThrows(
+                    InvalidKeySizeException.class,
+                    () -> new AES(new byte[size])
+            );
+        }
+    }
+
+    @Test
+    void invalidHexKey() {
+        Assertions.assertThrows(
+                InvalidKeySizeException.class,
+                () -> new AES("000102")
+        );
     }
 }

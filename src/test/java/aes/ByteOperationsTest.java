@@ -17,12 +17,29 @@ class ByteOperationsTest {
     }
 
     @Test
-    void subBytes() {
-        byte[] input = {0x00, 0x01, (byte) 0x80, (byte) 0xFF};
+    void rotBytes() {
+        byte[] bytes = {1, 2, 3, 4, 5, 6};
+
+        ByteOperations.rotBytes(bytes, 0, 3, 1, 2);
+
+        assertArrayEquals(
+                new byte[] {3, 2, 5, 4, 1, 6},
+                bytes
+        );
+    }
+
+    @Test
+    void subBytesAndInverse() {
+        byte[] input = new byte[256];
+        for (int i = 0; i < 256; ++i)
+            input[i] = (byte) i;
+
+        byte[] original = input.clone();
 
         ByteOperations.subBytes(input);
+        ByteOperations.subBytesInv(input);
 
-        assertArrayEquals(new byte[] {(byte) 0x63, (byte) 0x7C, (byte) 0xCD, (byte) 0x16}, input);
+        assertArrayEquals(original, input);
     }
 
     @Test
@@ -49,6 +66,26 @@ class ByteOperationsTest {
         ByteOperations.plusRange(a, 1, b);
 
         assertArrayEquals(new byte[] {0x00, (byte) 0xF0, 0x0F, 0x00}, a);
+    }
+
+    @Test
+    void mult() {
+        assertEquals((byte) 0xAE, ByteOperations.mult((byte) 0x57, 2));
+        assertEquals((byte) 0xF9, ByteOperations.mult((byte) 0x57, 3));
+        assertEquals((byte) 0x47, ByteOperations.mult((byte) 0x57, 4));
+        assertEquals((byte) 0xD9, ByteOperations.mult((byte) 0x57, 9));
+        assertEquals((byte) 0x77, ByteOperations.mult((byte) 0x57, 11));
+        assertEquals((byte) 0x9E, ByteOperations.mult((byte) 0x57, 13));
+        assertEquals((byte) 0x67, ByteOperations.mult((byte) 0x57, 14));
+    }
+
+    @Test
+    void multByZeroAndOne() {
+        for (int i = 0; i < 256; ++i) {
+            byte a = (byte) i;
+            assertEquals((byte) 0, ByteOperations.mult(a, 0));
+            assertEquals(a, ByteOperations.mult(a, 1));
+        }
     }
 
     @Test
