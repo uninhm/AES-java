@@ -25,3 +25,6 @@ replay_pid*
 
 # Intellij IDEA's configuration
 .idea
+
+# The build directory
+target/

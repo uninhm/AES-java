@@ -11,7 +11,7 @@ class AESTest {
 
     @Test
     void encrypt128() {
-        AES aes = new AES("000102030405060708090a0b0c0d0e0f");
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f", new PaddingZeros());
 
         Assertions.assertArrayEquals(
                 HexFormat.of().parseHex("3b61ec0f4acd3b5eb2425bdc221a0949"),
@@ -26,7 +26,7 @@ class AESTest {
 
     @Test
     void encrypt192() {
-        AES aes = new AES("000102030405060708090a0b0c0d0e0f1011121314151617");
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f1011121314151617", new PaddingZeros());
 
         Assertions.assertArrayEquals(
                 HexFormat.of().parseHex("a875c99f5ea3af568786a5d1193872c8"),
@@ -41,11 +41,11 @@ class AESTest {
 
     @Test
     void encrypt256() {
-        AES aes = new AES("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", new PaddingZeros());
 
         Assertions.assertArrayEquals(
                 HexFormat.of().parseHex("cfcddbbe55865f859935c9452a3dff32"),
-                aes.encrypt("Hola")
+                aes.encrypt("Hola\0\0\0\0\0\0\0\0\0\0\0\0")
         );
 
         Assertions.assertArrayEquals(
@@ -56,10 +56,10 @@ class AESTest {
 
     @Test
     void decrypt128() {
-        AES aes = new AES("000102030405060708090a0b0c0d0e0f");
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f", new PaddingZeros());
 
         Assertions.assertArrayEquals(
-                HexFormat.of().parseHex("486f6c61000000000000000000000000"),
+                HexFormat.of().parseHex("486f6c61"),
                 aes.decrypt(HexFormat.of().parseHex("3b61ec0f4acd3b5eb2425bdc221a0949"))
         );
 
@@ -71,7 +71,7 @@ class AESTest {
 
     @Test
     void decrypt192() {
-        AES aes = new AES("000102030405060708090a0b0c0d0e0f1011121314151617");
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f1011121314151617", new PaddingZeros());
 
         Assertions.assertArrayEquals(
                 "Hola como estas ".getBytes(),
@@ -86,10 +86,10 @@ class AESTest {
 
     @Test
     void decrypt256() {
-        AES aes = new AES("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", new PaddingZeros());
 
         Assertions.assertArrayEquals(
-                HexFormat.of().parseHex("486f6c61000000000000000000000000"),
+                HexFormat.of().parseHex("486f6c61"),
                 aes.decrypt(HexFormat.of().parseHex("cfcddbbe55865f859935c9452a3dff32"))
         );
 
@@ -136,7 +136,7 @@ class AESTest {
 
     @Test
     void plaintextLengths() {
-        AES aes = new AES("000102030405060708090a0b0c0d0e0f");
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f", new PaddingZeros());
 
         Assertions.assertEquals(0, aes.encrypt(new byte[0]).length);
         Assertions.assertEquals(16, aes.encrypt(new byte[1]).length);
