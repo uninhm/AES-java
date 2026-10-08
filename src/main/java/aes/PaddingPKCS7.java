@@ -35,7 +35,10 @@ public class PaddingPKCS7 extends Padding {
      */
     @Override
     public byte[] unpad(byte[] data, int blockSize) {
-        if (data.length == 0 || data.length%blockSize != 0 || data[data.length-1] > blockSize)
+        if (data.length == 0
+                || data.length%blockSize != 0
+                || data[data.length-1] > blockSize
+                || data[data.length-1] == 0)
             throw new IllegalArgumentException("The data is not padded correctly");
 
         int originalLength = data.length-data[data.length-1];
