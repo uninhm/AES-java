@@ -7,7 +7,7 @@
 
     <groupId>com.github.uninhm</groupId>
     <artifactId>AES-java</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>

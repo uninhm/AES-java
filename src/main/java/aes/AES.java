@@ -1,5 +1,6 @@
 package aes;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 
@@ -29,22 +30,51 @@ public class AES {
     private int round;
 
     private final KeyGenerator keyGenerator;
+    private final Padding padding;
 
-    /** Construct an AES object with the corresponding key.
+    /** Construct an AES object with the corresponding key and padding.
+     * The array must be of length 16, 24 or 32 for AES 128, 192 and 256 respectively.
+     * @param key an array containing the bytes of the key
+     * @param padding the padding to be used
+     */
+    public AES(byte[] key, Padding padding) {
+        this.keySize = key.length * 8;
+        this.keyGenerator = new KeyGenerator(key);
+        this.padding = padding;
+    }
+
+     /** Construct an AES object with the corresponding key and padding.
+      * The number of bytes in the string must be 16, 24 or 32 for AES 128, 192 and 256 respectively.
+      * @param key the hexadecimal representation of the key
+      * @param padding the padding to be used
+      */
+    public AES(String key, Padding padding) {
+        this(HexFormat.of().parseHex(key), padding);
+    }
+
+    /** Construct an AES object with the corresponding key with padding mode PKCS7.
      * The array must be of length 16, 24 or 32 for AES 128, 192 and 256 respectively.
      * @param key an array containing the bytes of the key
      */
     public AES(byte[] key) {
-        this.keySize = key.length * 8;
-        this.keyGenerator = new KeyGenerator(key);
+        this(key, new PaddingPKCS7());
     }
 
-    /** Construct an AES object with the corresponding key.
+    /** Construct an AES object with the corresponding key and with padding mode PKCS7.
      * The number of bytes in the string must be 16, 24 or 32 for AES 128, 192 and 256 respectively.
      * @param key the hexadecimal representation of the key
      */
     public AES(String key) {
-        this(HexFormat.of().parseHex(key));
+        this(key, new PaddingPKCS7());
+    }
+
+    /** Encrypt a message encoded with the specified charset.
+     * @param message the message string
+     * @param charset the charset to be used
+     * @return the encrypted message as an array of bytes
+     */
+    public byte[] encrypt(String message, Charset charset) {
+        return encrypt(message.getBytes(charset));
     }
 
     /** Encrypt a message encoded with UTF_8.
@@ -52,21 +82,21 @@ public class AES {
      * @return the encrypted message as an array of bytes
      */
     public byte[] encrypt(String message) {
-        return encrypt(message.getBytes(StandardCharsets.UTF_8));
+        return encrypt(message, StandardCharsets.UTF_8);
     }
 
     /** Encrypt an array of bytes.
-     * If the length isn't a multiple of 16, 0s will be added as padding at the end.
+     * The corresponding padding will be added.
      * @param message the message as an array of bytes
      * @return the encrypted message as an array of bytes
      */
     public byte[] encrypt(byte[] message) {
-        // The resulting length is the next multiple of 16 after the message length
-        byte[] result = new byte[(message.length+15)/16*16];
+        byte[] paddedMessage = this.padding.pad(message, BLOCK_SIZE);
+        byte[] result = new byte[paddedMessage.length];
 
-        for (int i = 0; i < message.length; i += BLOCK_SIZE) {
+        for (int i = 0; i < paddedMessage.length; i += BLOCK_SIZE) {
             // Copy the resulting block to the result
-            System.arraycopy(this.encryptBlock(message, i), 0, result, i, BLOCK_SIZE);
+            System.arraycopy(this.encryptBlock(paddedMessage, i), 0, result, i, BLOCK_SIZE);
         }
 
         return result;
@@ -79,7 +109,7 @@ public class AES {
      */
     public byte[] decrypt(byte[] cypher) {
         if (cypher.length % BLOCK_SIZE != 0)
-            throw new IllegalArgumentException("The length of the cypher text must be a multiple of 16");
+            throw new IllegalArgumentException("The length of the cyphertext must be a multiple of 16");
 
         byte[] result = new byte[cypher.length];
 
@@ -88,23 +118,21 @@ public class AES {
             System.arraycopy(this.decryptBlock(cypher, i), 0, result, i, BLOCK_SIZE);
         }
 
-        return result;
+        return this.padding.unpad(result, BLOCK_SIZE);
     }
 
-    /// Encrypt a block given as an array of bytes. If there aren't
-    /// enough bytes to make a block of 16, 0s will be added to the right.
+    /// Encrypt a block from a given array of bytes starting at index 'start'.
+    /// The length of the block will be exactly 16 bytes.
     /// @param bytes the message byte array
     /// @param start the index where the block starts
     private byte[] encryptBlock(byte[] bytes, int start) {
-        // If there aren't enough bytes use as much as available
-        int actualLength = Math.min(bytes.length - start, BLOCK_SIZE);
+        // Requires 16 bytes
+        if (bytes.length - start < BLOCK_SIZE)
+            // This should never happen if the padding is correct
+            throw new IllegalArgumentException("There aren't enough bytes to make a block");
 
         // Copy the block to the state
-        System.arraycopy(bytes, start, this.state, 0, actualLength);
-
-        // Add padding when needed
-        for (int i = actualLength; i < BLOCK_SIZE; ++i)
-            state[i] = 0;
+        System.arraycopy(bytes, start, this.state, 0, BLOCK_SIZE);
 
         round = 0;
         this.addRoundKey();
