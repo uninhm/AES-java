@@ -36,9 +36,9 @@ Then add the following dependency to your project's `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.github.uninhm</groupId>
+    <groupId>dev.uninhm.aes</groupId>
     <artifactId>AES-java</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
