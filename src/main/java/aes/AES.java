@@ -118,7 +118,7 @@ public class AES {
             System.arraycopy(this.decryptBlock(cypher, i), 0, result, i, BLOCK_SIZE);
         }
 
-        return this.padding.unpad(result);
+        return this.padding.unpad(result, BLOCK_SIZE);
     }
 
     /// Encrypt a block from a given array of bytes starting at index 'start'.

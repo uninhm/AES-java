@@ -29,13 +29,13 @@ class PaddingPKCS7Test {
         PaddingPKCS7 padding = new PaddingPKCS7();
 
         assertArrayEquals(
-                new byte[] {1, 2, 3, 4, 5, 6, 7, 8},
-                padding.unpad(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8})
+                new byte[] {1, 2, 3, 4},
+                padding.unpad(new byte[] {1, 2, 3, 4, 4, 4, 4, 4}, 8)
         );
 
         assertArrayEquals(
                 new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
-                padding.unpad(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16})
+                padding.unpad(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16}, 16)
         );
     }
 
@@ -47,9 +47,34 @@ class PaddingPKCS7Test {
             byte[] original = new byte[i];
             rnd.nextBytes(original);
             byte[] padded = padding.pad(original, 16);
-            byte[] unpadded = padding.unpad(padded);
+            byte[] unpadded = padding.unpad(padded, 16);
 
             assertArrayEquals(original, unpadded);
         }
+    }
+
+    @Test
+    void invalidUnpad() {
+        PaddingPKCS7 padding = new PaddingPKCS7();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> padding.unpad(new byte[] {}, 16)
+        );
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> padding.unpad(new byte[] {1, 2, 3, 4}, 16)
+        );
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> padding.unpad(new byte[] {1, 2, 3, 4, 5, 6, 7, 8}, 8)
+        );
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> padding.unpad(new byte[] {1, 2, 3, 4, 5, 6, 7, 9}, 8)
+        );
     }
 }

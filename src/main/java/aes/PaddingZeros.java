@@ -23,7 +23,10 @@ public class PaddingZeros extends Padding {
     }
 
     @Override
-    public byte[] unpad(byte[] data) {
+    public byte[] unpad(byte[] data, int blockSize) {
+        if (data.length % blockSize != 0)
+            throw new IllegalArgumentException("The data is not padded correctly");
+
         int actualLength = data.length;
 
         while (data[actualLength-1] == 0) {

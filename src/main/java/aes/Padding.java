@@ -8,5 +8,5 @@ public abstract class Padding {
     public abstract byte[] pad(byte[] data, int blockSize);
 
     /** Remove the padding from the data. */
-    public abstract byte[] unpad(byte[] data);
+    public abstract byte[] unpad(byte[] data, int blockSize);
 }
