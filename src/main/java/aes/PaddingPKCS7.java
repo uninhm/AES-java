@@ -43,11 +43,11 @@ public class PaddingPKCS7 extends Padding {
 
         int originalLength = data.length-data[data.length-1];
 
+        // Check that all the bytes from the padding are equal to the length of the padding
         for (int i = originalLength; i < data.length-1; ++i)
             if (data[i] != data[data.length-1])
                 throw new IllegalArgumentException("The data is not padded correctly");
 
-        // Since the last byte is the padding length, we can simply remove it
-        return Arrays.copyOfRange(data, 0, data.length-data[data.length-1]);
+        return Arrays.copyOfRange(data, 0, originalLength);
     }
 }

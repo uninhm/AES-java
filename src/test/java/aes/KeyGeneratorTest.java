@@ -1,12 +1,15 @@
 package aes;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.HexFormat;
 
 class KeyGeneratorTest {
 
+    /**
+     * Test the 128-bit round key generation.
+     */
     @Test
     void getRoundKey128() {
         KeyGenerator keygen = new KeyGenerator("000102030405060708090a0b0c0d0e0f");
@@ -26,7 +29,7 @@ class KeyGeneratorTest {
         };
 
         for (int i = 0; i < keys.length; ++i) {
-            Assertions.assertArrayEquals(
+            assertArrayEquals(
                     HexFormat.of().parseHex(keys[i]),
                     keygen.getRoundKey(i)
             );
@@ -34,6 +37,9 @@ class KeyGeneratorTest {
         }
     }
 
+    /**
+     * Test the 192-bit round key generation.
+     */
     @Test
     void getRoundKey192() {
         KeyGenerator keygen = new KeyGenerator("000102030405060708090a0b0c0d0e0f1011121314151617");
@@ -55,7 +61,7 @@ class KeyGeneratorTest {
         };
 
         for (int i = 0; i < keys.length; ++i) {
-            Assertions.assertArrayEquals(
+            assertArrayEquals(
                     HexFormat.of().parseHex(keys[i]),
                     keygen.getRoundKey(i)
             );
@@ -63,7 +69,10 @@ class KeyGeneratorTest {
         }
     }
 
-    @org.junit.jupiter.api.Test
+    /**
+     * Test the 256-bit round key generation.
+     */
+    @Test
     void getRoundKey256() {
         KeyGenerator keygen = new KeyGenerator("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
 
@@ -86,7 +95,7 @@ class KeyGeneratorTest {
         };
 
         for (int i = 0; i < keys.length; ++i) {
-            Assertions.assertArrayEquals(
+            assertArrayEquals(
                     HexFormat.of().parseHex(keys[i]),
                     keygen.getRoundKey(i)
             );
@@ -99,7 +108,7 @@ class KeyGeneratorTest {
         int[] invalidSizes = {0, 1, 15, 17, 23, 25, 31, 33};
 
         for (int size : invalidSizes) {
-            Assertions.assertThrows(
+            assertThrows(
                     InvalidKeySizeException.class,
                     () -> new AES(new byte[size])
             );
@@ -108,7 +117,7 @@ class KeyGeneratorTest {
 
     @Test
     void invalidHexKey() {
-        Assertions.assertThrows(
+        assertThrows(
                 InvalidKeySizeException.class,
                 () -> new AES("000102")
         );
