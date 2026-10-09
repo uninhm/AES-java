@@ -3,6 +3,7 @@ package aes;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
 import java.util.Random;
 
@@ -179,5 +180,38 @@ class AESTest {
 
         assertArrayEquals(a, aes.decrypt(encryptedA));
         assertArrayEquals(b, aes.decrypt(encryptedB));
+    }
+
+    /**
+     * Test the encryption and decryption of non-ASCII characters.
+     */
+    @Test
+    void nonASCIICharacters() {
+        AES aes = new AES("000102030405060708090a0b0c0d0e0f");
+
+        String[] texts = {
+                "私はJavaが好きじゃない。",
+                "Δεν μου αρέσει η Java.",
+                "我不喜欢Java。",
+                "Мне не нравится Java.",
+                "મને જાવા પસંદ નથી.",
+                "ჯავა არ მომწონს.",
+                "Ես չեմ սիրում Java-ն։",
+                "من از جاوا خوشم نمیاد.",
+        };
+
+        for (String text : texts) {
+            // Test text with UTF-8 encoding
+            assertEquals(
+                    text,
+                    aes.decrypt(aes.encrypt(text, StandardCharsets.UTF_8), StandardCharsets.UTF_8)
+            );
+
+            // Test text with UTF-16 encoding
+            assertEquals(
+                    text,
+                    aes.decrypt(aes.encrypt(text, StandardCharsets.UTF_16), StandardCharsets.UTF_16)
+            );
+        }
     }
 }

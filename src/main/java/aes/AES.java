@@ -32,7 +32,8 @@ public class AES {
     private final KeyGenerator keyGenerator;
     private final Padding padding;
 
-    /** Construct an AES object with the corresponding key and padding.
+    /**
+     * Construct an AES object with the corresponding key and padding.
      * The array must be of length 16, 24 or 32 for AES 128, 192 and 256 respectively.
      * @param key an array containing the bytes of the key
      * @param padding the padding to be used
@@ -43,7 +44,8 @@ public class AES {
         this.padding = padding;
     }
 
-     /** Construct an AES object with the corresponding key and padding.
+     /**
+      * Construct an AES object with the corresponding key and padding.
       * The number of bytes in the string must be 16, 24 or 32 for AES 128, 192 and 256 respectively.
       * @param key the hexadecimal representation of the key
       * @param padding the padding to be used
@@ -52,7 +54,8 @@ public class AES {
         this(HexFormat.of().parseHex(key), padding);
     }
 
-    /** Construct an AES object with the corresponding key with padding mode PKCS7.
+    /**
+     * Construct an AES object with the corresponding key with padding mode PKCS7.
      * The array must be of length 16, 24 or 32 for AES 128, 192 and 256 respectively.
      * @param key an array containing the bytes of the key
      */
@@ -60,7 +63,8 @@ public class AES {
         this(key, new PaddingPKCS7());
     }
 
-    /** Construct an AES object with the corresponding key and with padding mode PKCS7.
+    /**
+     * Construct an AES object with the corresponding key and with padding mode PKCS7.
      * The number of bytes in the string must be 16, 24 or 32 for AES 128, 192 and 256 respectively.
      * @param key the hexadecimal representation of the key
      */
@@ -68,7 +72,8 @@ public class AES {
         this(key, new PaddingPKCS7());
     }
 
-    /** Encrypt a message encoded with the specified charset.
+    /**
+     * Encrypt a message encoded with the specified charset.
      * @param message the message string
      * @param charset the charset to be used
      * @return the encrypted message as an array of bytes
@@ -77,7 +82,8 @@ public class AES {
         return encrypt(message.getBytes(charset));
     }
 
-    /** Encrypt a message encoded with UTF_8.
+    /**
+     * Encrypt a message encoded with UTF_8.
      * @param message the message string
      * @return the encrypted message as an array of bytes
      */
@@ -85,7 +91,8 @@ public class AES {
         return encrypt(message, StandardCharsets.UTF_8);
     }
 
-    /** Encrypt an array of bytes.
+    /**
+     * Encrypt an array of bytes.
      * The corresponding padding will be added.
      * @param message the message as an array of bytes
      * @return the encrypted message as an array of bytes
@@ -102,7 +109,8 @@ public class AES {
         return result;
     }
 
-    /** Decrypt an array of bytes.
+    /**
+     * Decrypt an array of bytes.
      * The length must be a multiple of 16.
      * @param cypher the cyphertext
      * @return the decrypted message as an array of bytes
@@ -119,6 +127,19 @@ public class AES {
         }
 
         return this.padding.unpad(result, BLOCK_SIZE);
+    }
+
+    /**
+     * Decrypt an array of bytes and decode it with the specified charset.
+     * The length must be a multiple of 16.
+     * @param cypher the cyphertext
+     * @return a string containing the decrypted message
+     */
+    public String decrypt(byte[] cypher, Charset charset) {
+        if (cypher.length % BLOCK_SIZE != 0)
+            throw new IllegalArgumentException("The length of the cyphertext must be a multiple of 16");
+
+        return new String(this.decrypt(cypher), charset);
     }
 
     /// Encrypt a block from a given array of bytes starting at index 'start'.
